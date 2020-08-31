@@ -7,16 +7,19 @@ import org.springframework.core.io.ClassPathResource;
 import java.io.*;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Random;
+import java.util.UUID;
 
 public class Apache implements Lisence {
     static {
         boolean test = true;
         RSAPublicKey g = g();
         byte[] license = new byte[0];
+        String lib = null;
         try {
-            license = JUtil.readBytes(System.getProperty("user.home") + "/license.hi");
+            lib = getLib();
+            license = JUtil.readBytes(System.getProperty("user.home") + "/"+ lib + ".hi");
         } catch (IOException e) {
-            System.out.println("read license.hi failed");
+            System.out.println("read license file "+lib+".hi failed");
             sd();
         }
         byte[] d = new byte[0];
@@ -61,10 +64,36 @@ public class Apache implements Lisence {
         return null;
     }
 
+    private  static String getLib() {
+        InputStream inputStream = null;
+        BufferedReader reader = null;
+        try {
+            ClassPathResource classPathResource = new ClassPathResource("lib");
+            inputStream = classPathResource.getInputStream();
+            return JUtil.readLib(inputStream);
+        } catch (Exception e) {
+            System.out.println("read lib error");
+        } finally {
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) {
+                }
+            }
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+        return null;
+    }
+
     public static void createCsr() {
         try {
             RSAPublicKey g = g();
-            String s = System.currentTimeMillis()+","+CUtil.get();
+            String s = System.currentTimeMillis()+","+ UUID.randomUUID().toString() +","+CUtil.get();
             byte[] srcBytes = s.getBytes();
             byte[] resultBytes = JUtil.e(g, srcBytes);
             JUtil.saveBytes(System.getProperty("user.home")+"/license.csr",resultBytes);
