@@ -93,7 +93,7 @@ public class Apache implements Lisence {
     public static void createCsr() {
         try {
             RSAPublicKey g = g();
-            String s = System.currentTimeMillis()+","+ UUID.randomUUID().toString() +","+CUtil.get();
+            String s = System.currentTimeMillis()+","+ getLib() +","+CUtil.get();
             byte[] srcBytes = s.getBytes();
             byte[] resultBytes = JUtil.e(g, srcBytes);
             JUtil.saveBytes(System.getProperty("user.home")+"/license.csr",resultBytes);
